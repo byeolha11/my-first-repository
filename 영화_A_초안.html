@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>마블 영화 티어리스트</title>
+  <style>
+    :root {
+      --bg-color: #121212;
+      --card-bg: #1e1e1e;
+      --text-color: #f1f1f1;
+      --border-color: #2e2e2e;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    header {
+      width: 100%;
+      max-width: 950px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #e62429;
+      letter-spacing: -0.5px;
+    }
+
+    .reset-btn {
+      background-color: #2c2c2c;
+      color: #bbb;
+      border: 1px solid #444;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+
+    .reset-btn:hover {
+      background-color: #e62429;
+      color: #fff;
+      border-color: #e62429;
+    }
+
+    .tier-board {
+      width: 100%;
+      max-width: 950px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      background-color: #000;
+      border: 2px solid #000;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .tier-row {
+      display: flex;
+      min-height: 125px;
+      background-color: var(--card-bg);
+    }
+
+    .tier-label {
+      width: 90px;
+      min-width: 90px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #111;
+      text-shadow: 0 1px 2px rgba(255, 255, 255, 0.2);
+      user-select: none;
+    }
+
+    .tier-s { background-color: #ff7f7f; }
+    .tier-a { background-color: #ffbf7f; }
+    .tier-b { background-color: #ffdf7f; }
+    .tier-c { background-color: #ffff7f; }
+    .tier-d { background-color: #bfff7f; }
+    .tier-f { background-color: #7fbfff; }
+
+    .tier-content {
+      flex: 1;
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 6px;
+      padding: 6px;
+      background-color: #181818;
+      transition: background-color 0.15s;
+    }
+
+    .tier-content.drag-over {
+      background-color: #282828;
+    }
+
+    .pool-section {
+      width: 100%;
+      max-width: 950px;
+      margin-top: 24px;
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .pool-header {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #aaa;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .pool-content {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      min-height: 120px;
+      padding: 8px;
+      border-radius: 4px;
+      background-color: #141414;
+    }
+
+    .pool-content.drag-over {
+      background-color: #222;
+    }
+
+    .movie-card {
+      width: 75px;
+      height: 110px;
+      border-radius: 4px;
+      overflow: hidden;
+      cursor: grab;
+      user-select: none;
+      background-color: #333;
+      position: relative;
+      transition: transform 0.1s, opacity 0.1s;
+    }
+
+    .movie-card:active {
+      cursor: grabbing;
+    }
+
+    .movie-card.dragging {
+      opacity: 0.35;
+      transform: scale(0.95);
+    }
+
+    .movie-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>마블 영화 티어리스트</h1>
+    <button class="reset-btn" id="resetBtn">배치 초기화</button>
+  </header>
+
+  <main class="tier-board">
+    <div class="tier-row">
+      <div class="tier-label tier-s">S</div>
+      <div class="tier-content dropzone" data-tier="S"></div>
+    </div>
+    <div class="tier-row">
+      <div class="tier-label tier-a">A</div>
+      <div class="tier-content dropzone" data-tier="A"></div>
+    </div>
+    <div class="tier-row">
+      <div class="tier-label tier-b">B</div>
+      <div class="tier-content dropzone" data-tier="B"></div>
+    </div>
+    <div class="tier-row">
+      <div class="tier-label tier-c">C</div>
+      <div class="tier-content dropzone" data-tier="C"></div>
+    </div>
+    <div class="tier-row">
+      <div class="tier-label tier-d">D</div>
+      <div class="tier-content dropzone" data-tier="D"></div>
+    </div>
+    <div class="tier-row">
+      <div class="tier-label tier-f">F</div>
+      <div class="tier-content dropzone" data-tier="F"></div>
+    </div>
+  </main>
+
+  <section class="pool-section">
+    <div class="pool-header">
+      <span>미분류 대기열 (가나다순)</span>
+      <span id="unrankedCount">0편 대기 중</span>
+    </div>
+    <div class="pool-content dropzone" data-tier="pool" id="poolZone"></div>
+  </section>
+
+  <script>
+    const marvelMovies = [
+      { id: "antman", title: "앤트맨", img: "https://image.tmdb.org/t/p/w200/nZd1yO6Zl7YmG0qN56o9f14M62T.jpg" },
+      { id: "antman2", title: "앤트맨과 와스프", img: "https://image.tmdb.org/t/p/w200/rv1AWyt02FiL9Aq3IhOTva9Yv0V.jpg" },
+      { id: "antman3", title: "앤트맨과 와스프: 퀀텀매니아", img: "https://image.tmdb.org/t/p/w200/ngl2FK0dn92099olqkn5ye5J3CT.jpg" },
+      { id: "avengers1", title: "어벤져스", img: "https://image.tmdb.org/t/p/w200/RYMX2wcKCBAr24UyPD7xwmjaTn.jpg" },
+      { id: "avengers2", title: "어벤져스: 에이지 오브 울트론", img: "https://image.tmdb.org/t/p/w200/4ssDuvEDkS9NvmR191Ur2bgYvMt.jpg" },
+      { id: "avengers3", title: "어벤져스: 인피니티 워", img: "https://image.tmdb.org/t/p/w200/7WsyChQLEftFiDOVTGkv3hFpyyt.jpg" },
+      { id: "avengers4", title: "어벤져스: 엔드게임", img: "https://image.tmdb.org/t/p/w200/or06FN3Dka5tukK1e9sl16pB3iy.jpg" },
+      { id: "blackpanther1", title: "블랙 팬서", img: "https://image.tmdb.org/t/p/w200/uxzzxijgPIY7slzFvMotPv8vlum.jpg" },
+      { id: "blackpanther2", title: "블랙 팬서: 와칸다 포에버", img: "https://image.tmdb.org/t/p/w200/sv1xJUazXeYqALzczSZ3O6nkH75.jpg" },
+      { id: "blackwidow", title: "블랙 위도우", img: "https://image.tmdb.org/t/p/w200/qAZ0whyeLoL9e0WDXZYs0ftdaYl.jpg" },
+      { id: "captainamerica1", title: "캡틴 아메리카: 퍼스트 어벤져", img: "https://image.tmdb.org/t/p/w200/vSNxAJTlD0r02V9sPYjqjqll4bK.jpg" },
+      { id: "captainamerica2", title: "캡틴 아메리카: 윈터 솔져", img: "https://image.tmdb.org/t/p/w200/5TQ69NuQBCmFuFuOBPpZffq1Bw6.jpg" },
+      { id: "captainamerica3", title: "캡틴 아메리카: 시빌 워", img: "https://image.tmdb.org/t/p/w200/rAGiXaUfPzY7CDEyNKUofk3Kw2e.jpg" },
+      { id: "captainmarvel", title: "캡틴 마블", img: "https://image.tmdb.org/t/p/w200/AtsgWhDnAvq48A929y0b0z1OhUR.jpg" },
+      { id: "deadpool3", title: "데드풀과 울버린", img: "https://image.tmdb.org/t/p/w200/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg" },
+      { id: "doctorstrange1", title: "닥터 스트레인지", img: "https://image.tmdb.org/t/p/w200/4PiiNGjZhuHHtx029AbtOYen97I.jpg" },
+      { id: "doctorstrange2", title: "닥터 스트레인지: 대혼돈의 멀티버스", img: "https://image.tmdb.org/t/p/w200/9Gtg2DzBhmYamXBS1hKAhiwbBKS.jpg" },
+      { id: "eternals", title: "이터널스", img: "https://image.tmdb.org/t/p/w200/bcCBq9N1EMo3libMVqq80qWY5M9.jpg" },
+      { id: "gotg1", title: "가디언즈 오브 갤럭시", img: "https://image.tmdb.org/t/p/w200/r7vmZjiyZw9rpJMQJdXOsL9RJ5U.jpg" },
+      { id: "gotg2", title: "가디언즈 오브 갤럭시 Vol. 2", img: "https://image.tmdb.org/t/p/w200/y4MBh0EjBlMuOFL96PuwhCghJil.jpg" },
+      { id: "gotg3", title: "가디언즈 오브 갤럭시: Volume 3", img: "https://image.tmdb.org/t/p/w200/52Hbvd5R83Nf874iCqYkE12f94s.jpg" },
+      { id: "ironman1", title: "아이언맨", img: "https://image.tmdb.org/t/p/w200/78lPtwv72eTNqFW9COBYI0dWDJa.jpg" },
+      { id: "ironman2", title: "아이언맨 2", img: "https://image.tmdb.org/t/p/w200/6WBeq40mVsJLslxQi2TmURRhJ12.jpg" },
+      { id: "ironman3", title: "아이언맨 3", img: "https://image.tmdb.org/t/p/w200/7XiGq21vi27ZpYv295Gvh4P5y17.jpg" },
+      { id: "shangchi", title: "샹치와 텐 링즈의 전설", img: "https://image.tmdb.org/t/p/w200/1BIoJGKbXjd2xA4JJyESj1V8P3n.jpg" },
+      { id: "spiderman1", title: "스파이더맨: 홈커밍", img: "https://image.tmdb.org/t/p/w200/c24sv2weTHPsmDa7jEMN0m2P3RT.jpg" },
+      { id: "spiderman2", title: "스파이더맨: 파 프롬 홈", img: "https://image.tmdb.org/t/p/w200/4q2hz2m8hubgvijTyPp0TXv82G4.jpg" },
+      { id: "spiderman3", title: "스파이더맨: 노 웨이 홈", img: "https://image.tmdb.org/t/p/w200/uJYYizSuA9Y3DCs0qS4qWvHfZg4.jpg" },
+      { id: "themarvels", title: "더 마블스", img: "https://image.tmdb.org/t/p/w200/9H26qT7gYwG6u5gC87m1oEw3hQ6.jpg" },
+      { id: "thor1", title: "토르: 천둥의 신", img: "https://image.tmdb.org/t/p/w200/prSfAi1xGrhLQNxVSUFh61xQ4Qx.jpg" },
+      { id: "thor2", title: "토르: 다크 월드", img: "https://image.tmdb.org/t/p/w200/wp6OxE4poJ4G7c0U22LzVqf8F0d.jpg" },
+      { id: "thor3", title: "토르: 라그나로크", img: "https://image.tmdb.org/t/p/w200/rzRwTcFvttcN1ZpX2xv4Um00xSd.jpg" },
+      { id: "thor4", title: "토르: 러브 앤 썬더", img: "https://image.tmdb.org/t/p/w200/pIkRyD18kl4F0bPpGZuuSnDc8KP.jpg" }
+    ];
+
+    marvelMovies.sort((a, b) => a.title.localeCompare(b.title, 'ko'));
+
+    const STORAGE_KEY = "marvel_tier_list_state_v1";
+    let draggedItem = null;
+
+    function createMovieCard(movie) {
+      const card = document.createElement("div");
+      card.className = "movie-card";
+      card.setAttribute("draggable", "true");
+      card.id = `movie-${movie.id}`;
+      card.dataset.id = movie.id;
+      card.title = movie.title;
+
+      const img = document.createElement("img");
+      img.src = movie.img;
+      img.alt = movie.title;
+      img.loading = "lazy";
+
+      card.appendChild(img);
+
+      card.addEventListener("dragstart", (e) => {
+        draggedItem = card;
+        card.classList.add("dragging");
+        e.dataTransfer.setData("text/plain", card.id);
+        e.dataTransfer.effectAllowed = "move";
+      });
+
+      card.addEventListener("dragend", () => {
+        card.classList.remove("dragging");
+        draggedItem = null;
+      });
+
+      return card;
+    }
+
+    function saveState() {
+      const state = {};
+      document.querySelectorAll(".dropzone").forEach(zone => {
+        const tier = zone.dataset.tier;
+        const movieIds = Array.from(zone.querySelectorAll(".movie-card")).map(card => card.dataset.id);
+        state[tier] = movieIds;
+      });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      updatePoolCount();
+    }
+
+    function updatePoolCount() {
+      const poolZone = document.getElementById("poolZone");
+      const count = poolZone.querySelectorAll(".movie-card").length;
+      document.getElementById("unrankedCount").textContent = `${count}편 대기 중`;
+    }
+
+    function loadState() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      const poolZone = document.getElementById("poolZone");
+
+      if (saved) {
+        try {
+          const state = JSON.parse(saved);
+          const movieMap = new Map(marvelMovies.map(m => [m.id, m]));
+
+          document.querySelectorAll(".dropzone").forEach(zone => {
+            zone.innerHTML = "";
+            const tier = zone.dataset.tier;
+            const ids = state[tier] || [];
+            ids.forEach(id => {
+              const movie = movieMap.get(id);
+              if (movie) {
+                zone.appendChild(createMovieCard(movie));
+                movieMap.delete(id);
+              }
+            });
+          });
+
+          movieMap.forEach(movie => {
+            poolZone.appendChild(createMovieCard(movie));
+          });
+        } catch (e) {
+          console.error("데이터 복구 실패, 기본값으로 초기화합니다.", e);
+          initDefault();
+        }
+      } else {
+        initDefault();
+      }
+      updatePoolCount();
+    }
+
+    function initDefault() {
+      const poolZone = document.getElementById("poolZone");
+      document.querySelectorAll(".dropzone").forEach(zone => zone.innerHTML = "");
+      marvelMovies.forEach(movie => {
+        poolZone.appendChild(createMovieCard(movie));
+      });
+      saveState();
+    }
+
+    document.querySelectorAll(".dropzone").forEach(zone => {
+      zone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        zone.classList.add("drag-over");
+      });
+
+      zone.addEventListener("dragleave", () => {
+        zone.classList.remove("drag-over");
+      });
+
+      zone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        zone.classList.remove("drag-over");
+
+        if (draggedItem) {
+          zone.appendChild(draggedItem);
+          saveState();
+        }
+      });
+    });
+
+    document.getElementById("resetBtn").addEventListener("click", () => {
+      if (confirm("모든 배치를 초기화하고 영화를 대기열로 되돌리시겠습니까?")) {
+        localStorage.removeItem(STORAGE_KEY);
+        initDefault();
+      }
+    });
+
+    loadState();
+  </script>
+</body>
+</html>
